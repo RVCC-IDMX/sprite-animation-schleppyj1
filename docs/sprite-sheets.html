@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding Sprite Sheets</title>
+  <link rel="shortcut icon" href="./microscope.png" type="image/png">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <nav class="site-nav">
+        <div class="logo">
+          <a href="index.html">
+            <img src="./microscope.png" alt="phaser logo" class="logo-img">
+            <span>Sprite Animation</span>
+          </a>
+        </div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assignment.html" class="nav-link">Assignment</a></li>
+          <li><a href="sprite-sheets.html" class="nav-link">Sprite Sheets</a></li>
+          <li><a href="side-scrollers.html" class="nav-link">Side-Scrollers</a></li>
+          <li><a href="phaser-animation.html" class="nav-link">Animation</a></li>
+          <li><a href="common-pitfalls.html" class="nav-link">Pitfalls</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="header">
+
+    <h1>Understanding Sprite Sheets</h1>
+    <p>A guide to working with sprite sheets for character animation</p>
+  </section>
+
+  <article class="card">
+    <h2>What Are Sprite Sheets?</h2>
+    <p>
+      A sprite sheet is a collection of multiple images combined into a single image file. These individual images, or
+      frames, are often arranged in a grid layout. In game development, sprite sheets are commonly used to store
+      animations, where each frame represents one pose in an animation sequence.
+    </p>
+    <p>
+      Using sprite sheets offers several advantages:
+    </p>
+    <ul>
+      <li><strong>Performance:</strong> Loading a single image is faster than loading many individual images</li>
+      <li><strong>Memory efficiency:</strong> Reduces memory usage and texture swapping</li>
+      <li><strong>Organization:</strong> Keeps related animations together</li>
+      <li><strong>Bandwidth:</strong> Reduces the number of HTTP requests when loading game assets</li>
+    </ul>
+    <div class="sprite-example">
+      <img src="character.png" alt="Cat sprite sheet example" style="max-width: 100%;">
+    </div>
+    <p class="note">The example above shows a cat character sprite sheet with multiple animation frames arranged in a
+      row.</p>
+  </article>
+
+  <article class="card">
+    <h2>Anatomy of a Sprite Sheet</h2>
+    <p>
+      A typical sprite sheet consists of:
+    </p>
+    <ul>
+      <li><strong>Frames:</strong> Individual images arranged in a grid</li>
+      <li><strong>Rows and Columns:</strong> Organizational structure for the frames</li>
+      <li><strong>Frame Dimensions:</strong> The width and height of each individual frame</li>
+      <li><strong>Frame Spacing:</strong> Optional spacing between frames (some sprite sheets have gaps between frames)
+      </li>
+    </ul>
+    <p>
+      Frames are usually organized into groups representing different animations. For example:
+    </p>
+    <ul>
+      <li>Frames 0-9: Walking animation</li>
+      <li>Frames 10-15: Jumping animation</li>
+      <li>Frames 16-20: Idle animation</li>
+    </ul>
+    <p>
+      Understanding this structure is essential for loading and animating sprites correctly in your game.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Analyzing Your Sprite Sheet</h2>
+    <p>
+      Before using a sprite sheet in your game, you need to analyze its structure:
+    </p>
+    <ol>
+      <li>
+        <strong>Determine Frame Dimensions:</strong>
+        <p>
+          Measure the width and height of a single frame in pixels. Most sprite sheets use consistent frame sizes.
+        </p>
+      </li>
+      <li>
+        <strong>Identify Animation Sequences:</strong>
+        <p>
+          Determine which frames belong to each animation (walking, idle, jumping, etc.).
+        </p>
+      </li>
+      <li>
+        <strong>Note Frame Order:</strong>
+        <p>
+          Understand whether frames are arranged horizontally, vertically, or in a grid.
+        </p>
+      </li>
+      <li>
+        <strong>Check for Spacing or Padding:</strong>
+        <p>
+          Some sprite sheets include space between frames or padding around the edge.
+        </p>
+      </li>
+    </ol>
+    <p>
+      You can use image editing software like Photoshop, GIMP, or even the browser's developer tools to measure frame
+      dimensions.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Loading Sprite Sheets in Phaser</h2>
+    <p>
+      Phaser provides a straightforward way to load sprite sheets. In your scene's <code>preload()</code> method:
+    </p>
+    <pre><code>preload() {
+  // Basic sprite sheet loading
+  this.load.spritesheet('character', 'assets/character_sheet.png', {
+    frameWidth: 64,   // Width of each frame in pixels
+    frameHeight: 64   // Height of each frame in pixels
+  });
+
+  // Advanced options
+  this.load.spritesheet('character-complex', 'assets/character_complex.png', {
+    frameWidth: 64,   // Width of each frame
+    frameHeight: 64,  // Height of each frame
+    margin: 1,        // Space around the frames
+    spacing: 2        // Space between frames
+  });
+}</code></pre>
+    <p>
+      You must specify the frame dimensions when loading a sprite sheet. Phaser will then automatically slice the sheet
+      into individual frames that can be referenced by index.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Creating Animations from Sprite Sheets</h2>
+    <p>
+      Once your sprite sheet is loaded, you can create animations in your scene's <code>create()</code> method:
+    </p>
+    <pre><code>create() {
+  // Create a walking animation
+  this.anims.create({
+    key: 'walk',              // A unique name for the animation
+    frames: this.anims.generateFrameNumbers('character', {
+      start: 0,               // First frame index
+      end: 7                  // Last frame index
+    }),
+    frameRate: 10,            // Frames per second
+    repeat: -1                // -1 for infinite loop, or a number for specific repeats
+  });
+
+  // Create an idle animation from specific frames
+  this.anims.create({
+    key: 'idle',
+    frames: this.anims.generateFrameNumbers('character', {
+      frames: [8, 9, 10, 11]  // Specific frame indices
+    }),
+    frameRate: 5,
+    repeat: -1
+  });
+}</code>

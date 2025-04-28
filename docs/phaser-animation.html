@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phaser Animation Guide</title>
+  <link rel="shortcut icon" href="./microscope.png" type="image/png">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <nav class="site-nav">
+        <div class="logo">
+          <a href="index.html">
+            <img src="./microscope.png" alt="phaser logo" class="logo-img">
+            <span>Sprite Animation</span>
+          </a>
+        </div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assignment.html" class="nav-link">Assignment</a></li>
+          <li><a href="sprite-sheets.html" class="nav-link">Sprite Sheets</a></li>
+          <li><a href="side-scrollers.html" class="nav-link">Side-Scrollers</a></li>
+          <li><a href="phaser-animation.html" class="nav-link">Animation</a></li>
+          <li><a href="common-pitfalls.html" class="nav-link">Pitfalls</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="header">
+
+    <h1>Phaser Animation Guide</h1>
+    <p>A comprehensive guide to animation techniques in Phaser 3</p>
+  </section>
+
+  <article class="card">
+    <h2>Animation in Phaser 3</h2>
+    <p>
+      Phaser 3 provides a powerful animation system that allows you to create fluid, frame-by-frame animations for your
+      game sprites. The animation system is built around these key concepts:
+    </p>
+    <ul>
+      <li>
+        <strong>Animation:</strong> A sequence of frames that play in order
+      </li>
+      <li>
+        <strong>Frames:</strong> Individual images that make up an animation
+      </li>
+      <li>
+        <strong>Frame Rate:</strong> How fast frames change (measured in frames per second)
+      </li>
+      <li>
+        <strong>Animation Manager:</strong> A global system that manages all animations
+      </li>
+    </ul>
+    <p>
+      Animations in Phaser are created once but can be used by multiple sprites, making them memory-efficient and easy
+      to manage.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>The Animation Creation Process</h2>
+    <p>
+      Creating animations in Phaser involves several steps:
+    </p>
+    <ol>
+      <li>
+        <strong>Load the Sprite Sheet:</strong> In the scene's <code>preload()</code> method
+      </li>
+      <li>
+        <strong>Create the Animation:</strong> Define frame sequences in the <code>create()</code> method
+      </li>
+      <li>
+        <strong>Assign to a Sprite:</strong> Tell a sprite which animation to play
+      </li>
+      <li>
+        <strong>Control the Animation:</strong> Start, stop, or change animations based on game events
+      </li>
+    </ol>
+    <p>
+      Let's explore each of these steps in detail.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Step 1: Loading Sprite Sheets</h2>
+    <p>
+      Before creating animations, you need to load your sprite sheets:
+    </p>
+    <pre><code>preload() {
+  // Basic sprite sheet loading
+  this.load.spritesheet('character', 'assets/images/character.png', {
+    frameWidth: 64,  // Width of each frame
+    frameHeight: 64, // Height of each frame
+  });
+
+  // With additional options
+  this.load.spritesheet('character2', 'assets/images/character2.png', {
+    frameWidth: 64,
+    frameHeight: 64,
+    margin: 1,    // Space around the frames
+    spacing: 2    // Space between frames
+  });
+}</code></pre>
+    <p>
+      Remember to set the correct frame dimensions based on your specific sprite sheet.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Step 2: Creating Animations</h2>
+    <p>
+      Once your sprite sheet is loaded, you can create animations in the <code>create()</code> method:
+    </p>
+    <pre><code>create() {
+  // Simple animation with sequential frames
+  this.anims.create({
+    key: 'walk',                // Animation name
+    frames: this.anims.generateFrameNumbers('character', {
+      start: 0,                 // First frame
+      end: 7                    // Last frame
+    }),
+    frameRate: 10,              // Frames per second
+    repeat: -1                  // -1 = loop infinitely
+  });
+
+  // Animation with specific frames (not sequential)
+  this.anims.create({
+    key: 'attack',
+    frames: this.anims.generateFrameNumbers('character', {
+      frames: [8, 9, 10, 11, 10, 9]  // Specific frame sequence
+    }),
+    frameRate: 10,
+    repeat: 0                   // 0 = play once
+  });
+}</code></pre>
+    <p>
+      You can create as many animations as you need for different character states.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Step 3: Playing Animations</h2>
+    <p>
+      To play an animation on a sprite:
+    </p>
+    <pre><code>// Create a sprite
+this.player = this.physics.add.sprite(100, 300, 'character');
+
+// Play animation
+this.player.anims.play('walk', true);</code></pre>
+    <p>
+      The second parameter (<code>true</code>) forces the animation to restart if it's already playing. This is useful
+      when you want to ensure the animation plays from the beginning when a state changes.
+    </p>
+    <p>
+      You can also control animations in other ways:
+    </p>
+    <pre><code>// Stop animation
+this.player.anims.stop();
+
+// Pause animation
+this.player.anims.pause();
+
+// Resume animation
+this.player.anims.resume();
+
+// Go to a specific frame
+this.player.anims.setCurrentFrame(
+  this.player.anims.currentAnim.frames[3]
+);</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Step 4: Animation Events</h2>
+    <p>
+      Phaser animations emit events that you can listen for:
+    </p>
+    <pre><code>// Listen for animation start
+this.player.on('animationstart', function (animation, frame) {
+  console.log('Animation started:', animation.key);
+});
+
+// Listen for animation complete (useful for non-looping animations)
+this.player.on('animationcomplete', function (animation, frame) {
+  console.log('Animation completed:', animation.key);
+
+  // Do something when animation completes
+  if (animation.key === 'attack') {
+    // Switch to idle animation after attack
+    this.anims.play('idle', true);
+  }
+}, this);
+
+// Listen for animation update (each frame change)
+this.player.on('animationupdate', function (animation, frame, gameObject) {
+  console.log('Animation updated:', frame.index);
+});</code></pre>
+    <p>
+      These events are particularly useful for timing game actions with specific animation frames, such as when a
+      character's attack animation reaches the "hit" frame.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Animation State Management</h2>
+    <p>
+      In games, characters often have multiple animations for different states. Here's how to manage these state
+      transitions:
+    </p>
+    <pre><code>update() {
+  // Reset velocity
+  this.player.setVelocityX(0);
+
+  // State: Moving Left
+  if (this.cursors.left.isDown) {
+    this.player.setVelocityX(-160);
+    this.player.setFlipX(true);
+    this.player.anims.play('walk', true);
+  }
+  // State: Moving Right
+  else if (this.cursors.right.isDown) {
+    this.player.setVelocityX(160);
+    this.player.setFlipX(false);
+    this.player.anims.play('walk', true);
+  }
+  // State: Jumping
+  else if (this.cursors.up.isDown && this.player.body.touching.down) {
+    this.player.setVelocityY(-330);
+    this.player.anims.play('jump', true);
+  }
+  // State: Attacking
+  else if (this.input.keyboard.checkDown(this.attackKey, 500)) {
+    this.player.anims.play('attack', true);
+  }
+  // State: Idle
+  else {
+    this.player.anims.play('idle', true);
+  }
+
+  // If in air, override with jump animation
+  if (!this.player.body.touching.down && this.player.body.velocity.y !== 0) {
+    this.player.anims.play('jump', true);
+  }
+}</code></pre>
+    <p>
+      This system prioritizes animations based on the current state, with proper overrides for special cases.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Advanced Animation Techniques</h2>
+    <p>
+      Once you master the basics, try these advanced techniques:
+    </p>
+
+    <h3>Animation Speed Control</h3>
+    <pre><code>// Slow down an animation
+this.player.anims.msPerFrame = 200;  // 200ms per frame (5fps)
+
+// Speed up an animation
+this.player.anims.msPerFrame = 50;   // 50ms per frame (20fps)
+
+// Variable speed based on movement
+const walkSpeed = Math.abs(this.player.body.velocity.x);
+const minFPS = 5;  // Slowest animation framerate
+const maxFPS = 15; // Fastest animation framerate
+const minSpeed = 0;
+const maxSpeed = 300;
+
+// Calculate FPS based on speed
+const fps = minFPS + ((maxFPS - minFPS) * (walkSpeed - minSpeed) / (maxSpeed - minSpeed));
+this.player.anims.msPerFrame = 1000 / fps;</code></pre>
+
+    <h3>Frame Callbacks</h3>
+    <p>
+      Execute code when specific frames play:
+    </p>
+    <pre><code>// Add callback to a specific frame
+this.anims.create({
+  key: 'attack',
+  frames: this.anims.generateFrameNumbers('character', {
+    frames: [8, 9, 10, 11, 12, 13]
+  }),
+  frameRate: 10,
+  repeat: 0
+});
+
+// When frame 10 plays (the "hit" frame), check for enemy collision
+this.player.on('animationupdate', function (animation, frame) {
+  if (animation.key === 'attack' && frame.index === 2) {
+    // Frame 10 is the 3rd frame (index 2) in our sequence
+    this.checkAttackHit();
+  }
+}, this);</code></pre>
+
+    <h3>Animation Chaining</h3>
+    <p>
+      Chain animations together using the animationcomplete event:
+    </p>
+    <pre><code>// First, create both animations
+this.anims.create({
+  key: 'jump',
+  frames: this.anims.generateFrameNumbers('character', {
+    start: 15,
+    end: 18
+  }),
+  frameRate: 10,
+  repeat: 0  // Play once
+});
+
+this.anims.create({
+  key: 'fall',
+  frames: this.anims.generateFrameNumbers('character', {
+    start: 19,
+    end: 21
+  }),
+  frameRate: 8,
+  repeat: 0  // Play once
+});
+
+// Chain them together
+this.player.on('animationcomplete_jump', function () {
+  this.player.anims.play('fall', true);
+}, this);
+
+// Then start the chain with:
+this.player.anims.play('jump', true);</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Animation Performance Tips</h2>
+    <p>
+      Keep these tips in mind for optimal animation performance:
+    </p>
+    <ul>
+      <li>
+        <strong>Use Sprite Sheets:</strong> Always use sprite sheets instead of individual image files
+      </li>
+      <li>
+        <strong>Limit Animation Speed:</strong> Keep frame rates reasonable (10-30fps)
+      </li>
+      <li>
+        <strong>Reuse Animations:</strong> Create animations once and reuse them for multiple sprites
+      </li>
+      <li>
+        <strong>Pause Off-Screen Animations:</strong> Don't animate sprites that are off-screen
+      </li>
+      <li>
+        <strong>Keep Sprite Size Reasonable:</strong> Large sprites require more processing power
+      </li>
+    </ul>
+    <p>
+      Following these practices will help keep your game running smoothly, especially on mobile devices.
+    </p>
+  </article>
+</body>
+
+</html>

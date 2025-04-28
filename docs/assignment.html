@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Animation Assignment</title>
+  <link rel="shortcut icon" href="./microscope.png" type="image/png">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <nav class="site-nav">
+        <div class="logo">
+          <a href="index.html">
+            <img src="./microscope.png" alt="phaser logo" class="logo-img">
+            <span>Sprite Animation</span>
+          </a>
+        </div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assignment.html" class="nav-link">Assignment</a></li>
+          <li><a href="sprite-sheets.html" class="nav-link">Sprite Sheets</a></li>
+          <li><a href="side-scrollers.html" class="nav-link">Side-Scrollers</a></li>
+          <li><a href="phaser-animation.html" class="nav-link">Animation</a></li>
+          <li><a href="common-pitfalls.html" class="nav-link">Pitfalls</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="header">
+    <h1>Sprite Animation Assignment</h1>
+    <p>Step-by-step guide to implementing character animation in Phaser 3</p>
+  </section>
+
+  <article class="card">
+    <h2>Overview</h2>
+    <p>In this assignment, you'll create a side-scrolling character animation demo using Phaser 3. You'll implement a
+      character that can walk left and right, with animations that change based on movement state.</p>
+    <p>The starter code provides the project structure and configuration, but you'll need to create all the JavaScript
+      files and implement the character animation and movement logic yourself.</p>
+  </article>
+
+  <article class="card">
+    <h2>Getting Started</h2>
+    <h3>Step 1: Clone the Repository</h3>
+
+    <h3>Step 2: Install Dependencies</h3>
+    <p>Install the project dependencies using npm:</p>
+    <pre><code>npm install</code></pre>
+    <p>This will install Phaser and other necessary packages defined in the package.json file.</p>
+
+    <h3>Step 3: Explore the Project Structure</h3>
+    <p>The starter repository has the following structure:</p>
+    <pre><code>phaser-sprite-animation/
+├── public/
+│   └── assets/
+│       ├── images/
+│         └── background.png
+│         └── character.png
+│       └── sounds/
+├── src/             (You'll create files here)
+│   └── scenes/      (You'll create scene files here)
+├── docs/            (Documentation and tutorials)
+├── index.html       (Main HTML file)
+├── package.json     (Project dependencies)
+├── vite.config.mjs  (Vite configuration)
+└── netlify.toml     (Netlify deployment config)</code></pre>
+
+    <h3>Step 4: Note Your Character Sprite Sheet</h3>
+    <p>The background image and sprite sheet exists in your project's
+      <code>public/assets/images/</code> directory.
+    </p>
+
+    <h3>Step 5: Start the Development Server</h3>
+    <p>Start the Vite development server:</p>
+    <pre><code>npm run dev</code></pre>
+    <p>This will launch a local development server at <code>http://localhost:3000</code>.
+    </p>
+    <p>
+      Open dev tools to the console. You'll
+      see an error at first
+      since you haven't created any JavaScript files yet.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 1: Creating the Game Entry Point</h2>
+    <p>First, you'll need to create the main entry point for your game.</p>
+
+    <h3>1.1: Create the main.js File</h3>
+    <p>Create a file at <code>src/main.js</code> with the following content:</p>
+    <pre><code>// Import Phaser
+import Phaser from 'phaser';
+
+// Game configuration
+const config = {
+  parent: 'game-container', // Use the container from index.html
+  type: Phaser.AUTO,
+  width: 1200,
+  height: 600,
+  backgroundColor: '#87CEEB',  // Sky blue fallback color
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },  // No gravity for horizontal movement
+      debug: false        // Set to true to see collision boxes
+    }
+  },
+  // We'll add scenes to this array later
+  scene: []
+};
+
+// Create the game instance (but without scenes yet)
+new Phaser.Game(config);</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>import Phaser from 'phaser';</code> - Imports the Phaser library</li>
+      <li><code>parent: 'game-container'</code> - ID of the HTML element for the game canvas
+        into the DOM</li>
+      <li><code>type: Phaser.AUTO</code> - Lets Phaser choose the best renderer (WebGL or Canvas)</li>
+      <li><code>width, height</code> - Sets the game canvas dimensions</li>
+      <li><code>backgroundColor</code> - Sets a fallback color if no background image is loaded</li>
+      <li><code>physics: {default: 'arcade', ...}</code> - Configures the physics engine</li>
+      <li><code>scene: []</code> - An empty array that will hold our game scenes</li>
+      <li><code>new Phaser.Game(config);</code> - Creates the game instance using our configuration</li>
+    </ul>
+
+    <h3>1.2: Testing Your Progress</h3>
+    <p>Save the file and check your browser. You should see a blank sky-blue canvas. This confirms that your basic setup
+      is working.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 2: Creating Your First Scene</h2>
+    <p>Now, let's create a title scene for your game.</p>
+
+    <h3>2.1: Create the Title Scene</h3>
+    <p>Create a new directory <code>src/scenes</code> if it doesn't exist already, then create a file at
+      <code>src/scenes/TitleScene.js</code> with this content:
+    </p>
+    <pre><code>import Phaser from 'phaser';
+
+/**
+ * TitleScene
+ * The first scene shown when the game starts.
+ */
+export default class TitleScene extends Phaser.Scene {
+  constructor() {
+    // The key is used to reference this scene
+    super({ key: 'TitleScene' });
+  }
+
+  /**
+   * Preload assets for the game
+   */
+  preload() {
+    // You'll add code here to load your character sprite sheet
+  }
+
+  /**
+   * Create game objects and set up the title screen
+   */
+  create() {
+    // Add a title text
+    this.add.text(600, 200, 'Character Animation Demo', {
+      fontFamily: 'Arial',
+      fontSize: '48px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 4
+    }).setOrigin(0.5);
+
+    // Add instructions
+    this.add.text(600, 300, 'Press any key to start', {
+      fontFamily: 'Arial',
+      fontSize: '24px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2
+    }).setOrigin(0.5);
+
+    // Listen for keyboard input to start the game
+    this.input.keyboard.once('keydown', () => {
+      // We'll start the gameplay scene once it's created
+      console.log('Key pressed - would start gameplay scene');
+    });
+  }
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>export default class TitleScene extends Phaser.Scene</code> - Creates a new scene class that inherits
+        from Phaser.Scene</li>
+      <li><code>super({ key: 'TitleScene' })</code> - Sets a unique key to identify this scene</li>
+      <li><code>preload()</code> - Method where assets are loaded (currently empty)</li>
+      <li><code>create()</code> - Method where game objects are created</li>
+      <li><code>this.add.text()</code> - Creates text on screen with specified position and styling</li>
+      <li><code>setOrigin(0.5)</code> - Centers the text at its position coordinates</li>
+      <li><code>this.input.keyboard.once()</code> - Sets up a one-time event listener for keyboard input</li>
+    </ul>
+
+    <h3>2.2: Update main.js to Use the Title Scene</h3>
+    <p>Now update <code>src/main.js</code> to import and use your TitleScene. <strong>Add these changes:</strong></p>
+    <pre><code>// Import Phaser
+import Phaser from 'phaser';
+
+// Import scenes
+import TitleScene from './scenes/TitleScene';  // NEW: Import the TitleScene
+
+// Game configuration
+const config = {
+  parent: 'game-container', // Use the container from index.html
+  type: Phaser.AUTO,
+  width: 1200,
+  height: 600,
+  backgroundColor: '#87CEEB',  // Sky blue fallback color
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },  // No gravity for horizontal movement
+      debug: false        // Set to true to see collision boxes
+    }
+  },
+  // Add the title scene
+  scene: [TitleScene]  // CHANGED: Now includes TitleScene
+};
+
+// Create the game instance
+new Phaser.Game(config);</code></pre>
+
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Added an import statement for the TitleScene</li>
+      <li>Updated the <code>scene</code> array to include TitleScene</li>
+    </ul>
+
+    <h3>2.3: Testing Your Title Scene</h3>
+    <p>Save both files and check your browser. You should now see your title text and instructions. The game won't
+      proceed when you press a key yet, since you haven't created the gameplay scene.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 3: Loading Your Character Sprite Sheet</h2>
+    <p>Now, let's update the title scene to load the character sprite sheet that's included in the starter repo.</p>
+
+    <h3>3.1: Understanding Sprite Sheet Dimensions</h3>
+    <p>The repo includes a cat character sprite sheet (<code>character.png</code>) in the
+      <code>public/assets/images/</code> directory. Before loading it, we need to understand its dimensions:
+    </p>
+
+    <ul>
+      <li>The full sprite sheet has 10 frames of animation showing a cat walking</li>
+      <li>The total image size is 3400×474 pixels</li>
+      <li>Since there are 10 frames arranged horizontally, each frame is 340 pixels wide (3400 ÷ 10 = 340)</li>
+      <li>The height of each frame is 474 pixels</li>
+    </ul>
+
+    <div style="text-align: center; margin: 20px 0;">
+      <img src="character.png" alt="Cat sprite sheet with 10 frames" style="max-width: 100%; margin-bottom: 10px;">
+      <p><em>The character sprite sheet with 10 frames (0-9) showing walking animation</em></p>
+    </div>
+
+    <p><strong>Note:</strong> When using your own sprite sheets, you can determine the dimensions by:</p>
+    <ul>
+      <li>Opening the image in an image editor and checking its properties</li>
+      <li>In VS Code, opening the image will show its dimensions in the status bar at the bottom</li>
+      <li>Dividing the total width by the number of frames to get the individual frame width</li>
+    </ul>
+
+    <h3>3.2: Update the Preload Method</h3>
+    <p>Now update the <code>preload()</code> method in <code>src/scenes/TitleScene.js</code> with <strong>these
+        changes</strong>:</p>
+    <pre><code>preload() {
+  // Load a background image
+  this.load.image('background', 'assets/images/background.png');
+
+  // Load the character sprite sheet with calculated dimensions
+  this.load.spritesheet('character', 'assets/images/character.png', {
+    frameWidth: 340,   // Width of each frame (3400px total width ÷ 10 frames)
+    frameHeight: 474   // Height of each frame
+  });
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>this.load.image()</code> - Loads a simple background image</li>
+      <li><code>this.load.spritesheet()</code> - Loads the cat sprite sheet with specific frame dimensions</li>
+      <li><code>frameWidth: 340</code> - Specifies the width of each individual frame</li>
+      <li><code>frameHeight: 474</code> - Specifies the height of each frame</li>
+    </ul>
+
+    <h3>3.3: Update the Create Method to Show the Background</h3>
+    <p>To verify that your assets are loading, <strong>update</strong> the <code>create()</code> method to display a
+      background:</p>
+    <pre><code>create() {
+  // Add background image, stretching to fit the game canvas
+  this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+  // Rest of your title scene code remains the same...
+  this.add.text(600, 200, '🐾 Character Animation 🐾', {
+    fontFamily: 'Arial',
+    fontSize: '48px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 4
+  }).setOrigin(0.5);
+
+  // ... other code
+}</code></pre>
+
+    <h3>3.4: Testing Asset Loading</h3>
+    <p>Save the file and check your browser. You should see the background image behind the title text. Be sure to check
+      the browser console for error details.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 4: Creating the Gameplay Scene</h2>
+    <p>Now, let's create the main gameplay scene where your character will be animated and controlled.</p>
+
+    <h3>4.1: Create the Gameplay Scene</h3>
+    <p>Create a file at <code>src/scenes/GameplayScene.js</code> with this content:</p>
+    <pre><code>import Phaser from 'phaser';
+
+/**
+ * GameplayScene
+ * The main gameplay scene with animated character.
+ */
+export default class GameplayScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameplayScene' });
+
+    // Initialize properties
+    this.player = null;
+    this.cursors = null;
+  }
+
+  /**
+   * Create game objects and set up the gameplay
+   */
+  create() {
+    // Add background image
+    this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+    // Create a static character (no animation yet)
+    this.player = this.physics.add.sprite(400, 450, 'character', 0);
+
+    // You could scale the player if needed
+    // this.player.setScale(0.5);
+
+    // Enable world bounds collision
+    this.player.setCollideWorldBounds(true);
+
+    // Create cursor keys for input
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Add escape key to end game
+    this.input.keyboard.on('keydown-ESC', () => {
+      console.log('ESC pressed - would go to game over scene');
+    });
+  }
+
+  /**
+   * Update game objects on every frame
+   */
+  update() {
+    // We'll add character movement code here later
+  }
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>this.player = null;</code> - Initializes player property in the constructor</li>
+      <li><code>this.physics.add.sprite()</code> - Creates a sprite with physics enabled</li>
+      <li><code>setCollideWorldBounds(true)</code> - Prevents the sprite from leaving the game area</li>
+      <li><code>this.input.keyboard.createCursorKeys()</code> - Creates an object to handle arrow key input</li>
+      <li><code>this.input.keyboard.on()</code> - Sets up an event listener for a specific key</li>
+      <li><code>update()</code> - A method that runs every frame (currently empty)</li>
+    </ul>
+
+    <h3>4.2: Create the Game Over Scene</h3>
+    <p>Create a file at <code>src/scenes/GameOverScene.js</code> with this content:</p>
+    <pre><code>import Phaser from 'phaser';
+
+/**
+ * GameOverScene
+ * Displayed when the game ends.
+ */
+export default class GameOverScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameOverScene' });
+  }
+
+  /**
+   * Create game objects for the game over screen
+   */
+  create() {
+    // Add background image
+    this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+    // Add semi-transparent dark overlay
+    this.add.rectangle(600, 300, 1200, 600, 0x000000, 0.5);
+
+    // Game Over text
+    this.add.text(600, 250, 'Game Over', {
+      fontFamily: 'Arial',
+      fontSize: '64px',
+      color: '#ff4444',
+      stroke: '#000000',
+      strokeThickness: 6
+    }).setOrigin(0.5);
+
+    // Restart instructions
+    this.add.text(600, 350, 'Press any key to restart', {
+      fontFamily: 'Arial',
+      fontSize: '24px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2
+    }).setOrigin(0.5);
+
+    // Listen for keyboard input to restart
+    this.input.keyboard.once('keydown', () => {
+      this.scene.start('TitleScene');
+    });
+  }
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>this.add.rectangle()</code> - Creates a semi-transparent overlay</li>
+      <li><code>0x000000, 0.5</code> - Black color with 50% opacity</li>
+      <li><code>this.scene.start('TitleScene')</code> - Changes to the TitleScene when a key is pressed</li>
+    </ul>
+
+    <h3>4.3: Update main.js to Include All Scenes</h3>
+    <p><strong>Update</strong> <code>src/main.js</code> to include all three scenes:</p>
+    <pre><code>// Import Phaser
+import Phaser from 'phaser';
+
+// Import scenes
+import TitleScene from './scenes/TitleScene';
+import GameplayScene from './scenes/GameplayScene';  // NEW
+import GameOverScene from './scenes/GameOverScene';  // NEW
+
+// Game configuration
+const config = {
+  parent: 'game-container', // Use the container from index.html
+  type: Phaser.AUTO,
+  width: 1200,
+  height: 600,
+  backgroundColor: '#87CEEB',
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },
+      debug: false
+    }
+  },
+  // Add all three scenes
+  scene: [TitleScene, GameplayScene, GameOverScene]  // CHANGED
+};
+
+// Create the game instance
+new Phaser.Game(config);</code></pre>
+
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Added imports for GameplayScene and GameOverScene</li>
+      <li>Updated the scene array to include all three scenes in the correct order</li>
+    </ul>
+
+    <h3>4.4: Connect the Scenes</h3>
+    <p><strong>Update</strong> the TitleScene's input handler in <code>TitleScene.js</code> to start the GameplayScene:
+    </p>
+    <pre><code>// In TitleScene.js, REPLACE the keyboard event handler inside create()
+this.input.keyboard.once('keydown', () => {
+  this.scene.start('GameplayScene');  // CHANGED: Now actually starts the game
+});</code></pre>
+
+    <p><strong>Update</strong> the GameplayScene's ESC handler in <code>GameplayScene.js</code> to go to the
+      GameOverScene:</p>
+    <pre><code>// In GameplayScene.js, REPLACE the ESC handler inside create()
+this.input.keyboard.on('keydown-ESC', () => {
+  this.scene.start('GameOverScene');  // CHANGED: Now actually goes to game over
+});</code></pre>
+
+    <h3>4.5: Testing Scene Transitions</h3>
+    <p>Save all files and check your browser. You should now be able to:</p>
+    <ul>
+      <li>See the title screen</li>
+      <li>Press any key to go to the gameplay scene with your static character</li>
+      <li>Press ESC to go to the game over screen</li>
+      <li>Press any key at the game over screen to return to the title screen</li>
+    </ul>
+    <p>Test the complete cycle a few times to make sure all transitions work correctly.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 5: Creating Character Animation</h2>
+    <p>Now, let's create an animation for the cat character's walking movement. To do that you will add a new method to
+      the <code>GameplayScene</code> class</p>
+    <p><strong>Note: </strong>There is no required order to how methods must be placed in a class. Here is one
+      suggestion.
+      <br>
+      <img src="class-structure.png" width="650" alt="code snippet showing methods in class">
+    </p>
+
+    <h3>5.1: Create the Animation Method</h3>
+
+    <p>Add a method to create animations in your <code>GameplayScene.js</code> file:</p>
+    <pre><code>/**
+ * Create character animations from the sprite sheet
+ */
+createAnimations() {
+  // Walking animation using all 10 frames (0-9) from the cat sprite sheet
+  this.anims.create({
+    key: 'walk',
+    frames: this.anims.generateFrameNumbers('character', {
+      start: 0,   // First frame
+      end: 9      // Last frame (there are 10 frames total, 0-9)
+    }),
+    frameRate: 10,  // 10 frames per second
+    repeat: -1      // -1 means loop indefinitely
+  });
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>this.anims.create()</code> - Defines a new animation in Phaser</li>
+      <li><code>key: 'walk'</code> - Names the animation so we can reference it later</li>
+      <li><code>this.anims.generateFrameNumbers()</code> - Creates the sequence of frames from our sprite sheet</li>
+      <li><code>start: 0, end: 9</code> - Uses all 10 frames in the cat sprite sheet</li>
+      <li><code>frameRate: 10</code> - Animation plays at 10 frames per second</li>
+      <li><code>repeat: -1</code> - Animation will loop forever until stopped</li>
+    </ul>
+
+    <h3>5.2: Call the Animation Method and Create Player</h3>
+    <p>Add code to create the player sprite and call the animation method from your <code>create()</code> method:</p>
+    <pre><code>create() {
+  // Add background image
+  this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+  // NEW: Create animations
+  this.createAnimations();
+
+  // KEEP: your current player sprite
+  this.player = this.physics.add.sprite(400, 450, 'character');
+
+  // NEW: Scale down the player (the sprite is quite large)
+  this.player.setScale(0.5);
+
+  // Enable world bounds collision
+  this.player.setCollideWorldBounds(true);
+
+  // Rest of your create code...
+
+  // NEW: Play the walking animation to test it
+  this.player.anims.play('walk', true);
+}</code></pre>
+
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Added a call to <code>this.createAnimations()</code> to set up the walking animation</li>
+      <li>Created a player sprite with physics enabled</li>
+      <li>Scaled the player to 50% size since the original sprite is quite large</li>
+      <li>Started playing the 'walk' animation to test it</li>
+    </ul>
+
+    <h3>5.3: Testing Your Animation</h3>
+    <p>Save your changes and check your browser. After navigating to the gameplay scene, you should see the cat
+      character with a looping walk animation. If the animation doesn't look right, check:</p>
+    <ul>
+      <li>Frame indices - make sure you're using the correct start and end values (0-9)</li>
+      <li>Frame rate - try adjusting the frameRate value for smoother animation</li>
+      <li>Scale - you may need to adjust the scale value if the sprite appears too large or small</li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h2>Step 6: Organizing the Code</h2>
+    <p>Let's improve the organization of our code by creating a dedicated method for the player creation.</p>
+
+    <h3>6.1: Create a Player Creation Method</h3>
+    <p>Add this new method to your <code>GameplayScene.js</code> file:</p>
+    <pre><code>/**
+ * Create and configure the player character
+ */
+createPlayer() {
+  // Add player sprite at the left side of the screen
+  this.player = this.physics.add.sprite(170, 450, 'character');
+
+  // Scale the player down (the cat sprite is quite large)
+  this.player.setScale(0.5);
+
+  // Enable physics body
+  this.player.setCollideWorldBounds(true);
+
+  // Adjust the physics body size for better collision
+  // This creates a tighter collision box around the character
+  this.player.body.setSize(
+    this.player.width * 0.6,  // 60% of the sprite width
+    this.player.height * 0.8  // 80% of the sprite height
+  );
+
+  // Center the physics body
+  this.player.body.setOffset(
+    this.player.width * 0.2,  // 20% offset from left
+    this.player.height * 0.2  // 20% offset from top
+  );
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>setScale(0.5)</code> - Makes the sprite 50% of its original size</li>
+      <li><code>setCollideWorldBounds(true)</code> - Prevents the cat from leaving the screen</li>
+      <li><code>body.setSize()</code> - Creates a smaller collision box than the visible sprite</li>
+      <li><code>body.setOffset()</code> - Centers the collision box within the sprite</li>
+    </ul>
+
+    <h3>6.2: Update the Create Method</h3>
+    <p>Now update your <code>create()</code> method to use this new method:</p>
+    <pre><code>create() {
+  // Add background image
+  this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+  // Create animations
+  this.createAnimations();
+
+  // CHANGED: Create player using the new method
+  this.createPlayer();
+
+  // Set up input controls
+  this.cursors = this.input.keyboard.createCursorKeys();
+
+  // Add escape key to end game
+  this.input.keyboard.on('keydown-ESC', () => {
+    this.scene.start('GameOverScene');
+  });
+
+  // Add instructions text
+  this.add.text(600, 50, 'Use Arrow Keys to Move • Press ESC to End', {
+    fontFamily: 'Arial',
+    fontSize: '24px',
+    color: '#ffffff',
+    stroke: '#000000',
+    strokeThickness: 2
+  }).setOrigin(0.5);
+}</code></pre>
+
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Replaced the direct player creation code with a call to <code>this.createPlayer()</code></li>
+      <li>Added instruction text to guide the player</li>
+      <li>Organized the code into logical sections (background, animations, player, input, UI)</li>
+      <li>The animation has been temporarily removed</li>
+    </ul>
+
+    <h3>6.3: Testing the Refactored Code</h3>
+    <p>Save your changes and check your browser. The game should function the similar to before, but now with better
+      organized code. You should no longer see the cat with a walking animation. It's now positioned differently and
+      has
+      a more appropriate collision box.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 7: Adding Character Movement</h2>
+    <p>Now let's make the cat character respond to keyboard input for movement and implement proper boundary collision.
+    </p>
+
+    <h3>7.1: Implementing the Update Method</h3>
+    <p>Add this <code>update()</code> method to your <code>GameplayScene.js</code> file:</p>
+    <pre><code>/**
+ * Update game objects on every frame
+ */
+update() {
+  const speed = 160;  // Movement speed in pixels per second
+  const halfWidth = this.player.width * 0.5 * this.player.scale;
+  const worldWidth = this.scale.width;
+
+  // Reset horizontal velocity
+  this.player.setVelocityX(0);
+
+  // Handle left movement
+  if (this.cursors.left.isDown && this.player.x > halfWidth) {
+    this.player.setVelocityX(-speed);
+    this.player.setFlipX(true);  // Flip sprite to face left
+    this.player.anims.play('walk', true);
+  }
+  // Handle right movement
+  else if (this.cursors.right.isDown && this.player.x < worldWidth - halfWidth) {
+    this.player.setVelocityX(speed);
+    this.player.setFlipX(false);  // Normal orientation facing right
+    this.player.anims.play('walk', true);
+  }
+  // No movement or at edge
+  else {
+    // Stop animation and show first frame (idle pose)
+    this.player.anims.stop();
+    this.player.setFrame(0);
+  }
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li><code>const speed = 160</code> - Controls how fast the character moves</li>
+      <li><code>halfWidth</code> - Calculates half the width of the player sprite for boundary checking</li>
+      <li><code>this.player.setVelocityX(0)</code> - Resets horizontal movement at the start of each frame</li>
+      <li><code>this.cursors.left.isDown</code> - Checks if the left arrow key is pressed</li>
+      <li><code>this.player.x > halfWidth</code> - Prevents moving past the left edge of the screen</li>
+      <li><code>this.player.setFlipX(true)</code> - Mirrors the sprite horizontally when moving left</li>
+      <li><code>this.player.anims.play('walk', true)</code> - Plays the walking animation</li>
+      <li><code>this.player.anims.stop()</code> - Stops the animation when not moving</li>
+      <li><code>this.player.setFrame(0)</code> - Shows the first frame as a standing pose</li>
+    </ul>
+
+    <h3>7.2: Testing Character Movement</h3>
+    <p>Save your changes and check your browser. Now you should be able to:</p>
+    <ul>
+      <li>Move the cat left with the left arrow key</li>
+      <li>Move the cat right with the right arrow key</li>
+      <li>See the cat stop and stand still when no keys are pressed</li>
+      <li>See the cat flip horizontally to face the direction it's moving</li>
+      <li>Notice the cat can't move beyond the edges of the screen</li>
+    </ul>
+
+    <p>Try experimenting with different values:</p>
+    <ul>
+      <li>Change the <code>speed</code> value to make the cat move faster or slower</li>
+      <li>Modify the <code>setScale()</code> value in the <code>createPlayer()</code> method to change the cat's size
+      </li>
+    </ul>
+  </article>
+
+  <article class="card">
+    <h2>Step 8: Adding an Idle Animation (Optional)</h2>
+    <p>Currently, our cat just stops on the first frame when not moving. Let's add a proper idle animation to make it
+      more realistic.</p>
+
+    <h3>8.1: Creating the Idle Animation</h3>
+    <p>Update your <code>createAnimations()</code> method in <code>GameplayScene.js</code> to add an idle animation:</p>
+    <pre><code>createAnimations() {
+  // Walking animation (existing code)
+  this.anims.create({
+    key: 'walk',
+    frames: this.anims.generateFrameNumbers('character', {
+      start: 0,
+      end: 9
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  // NEW: Idle animation using just the first frame
+  // For a more complex idle animation, you could use multiple frames
+  // but our sprite sheet only has walking frames
+  this.anims.create({
+    key: 'idle',
+    frames: this.anims.generateFrameNumbers('character', {
+      frames: [0]  // Just use the first frame for a standing pose
+    }),
+    frameRate: 10,
+    repeat: -1
+  });
+}</code></pre>
+
+    <p><strong>Study this code:</strong></p>
+    <ul>
+      <li>We're creating a second animation called 'idle'</li>
+      <li>Instead of using a range of frames, we specify exactly which frame to use with <code>frames: [0]</code></li>
+      <li>For more complex idle animations, you could use multiple frames like <code>frames: [0, 1, 2]</code></li>
+    </ul>
+
+    <h3>8.2: Using the Idle Animation</h3>
+    <p>Now update your <code>update()</code> method to use the idle animation instead of just stopping:</p>
+    <pre><code>// In the update() method, REPLACE this code:
+// No movement or at edge
+else {
+  // Stop animation and show first frame (idle pose)
+  this.player.anims.stop();
+  this.player.setFrame(0);
+}
+
+// WITH this code:
+// No movement or at edge
+else {
+  // Play idle animation instead of stopping
+  this.player.anims.play('idle', true);
+}</code></pre>
+
+    <p><strong>What changed:</strong></p>
+    <ul>
+      <li>Instead of stopping the animation and setting a specific frame, we play the 'idle' animation</li>
+      <li>This approach is more flexible if you want to add a multi-frame idle animation later</li>
+    </ul>
+
+    <h3>8.3: Testing the Idle Animation</h3>
+    <p>Save your changes and check your browser. When not pressing any movement keys, the cat should still appear to be
+      standing still, but it's now using the idle animation. The visual difference isn't noticeable in this case because
+      our idle animation only has one frame, but the code structure allows for more complex idle animations in the
+      future.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 9: Completing the Game</h2>
+    <p>Now that we have all the core functionality implemented, let's review our complete <code>GameplayScene.js</code>
+      file:</p>
+
+    <pre><code>import Phaser from 'phaser';
+
+/**
+ * GameplayScene
+ * Main gameplay scene with animated character.
+ * Handles character movement, animation, and collision.
+ */
+export default class GameplayScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'GameplayScene' });
+
+    // Initialize properties
+    this.player = null;
+    this.cursors = null;
+  }
+
+  /**
+   * Create game objects and set up the gameplay
+   */
+  create() {
+    // Add background image
+    this.add.image(600, 300, 'background').setDisplaySize(1200, 600);
+
+    // Create character walking animation
+    this.createAnimations();
+
+    // Add player sprite with physics
+    this.createPlayer();
+
+    // Set up input controls
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Add ESC key to end game
+    this.input.keyboard.on('keydown-ESC', () => {
+      this.scene.start('GameOverScene');
+    });
+
+    // Add instructions
+    this.add.text(600, 50, 'Use Arrow Keys to Move • Press ESC to End', {
+      fontFamily: 'Arial',
+      fontSize: '24px',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 2
+    }).setOrigin(0.5);
+  }
+
+  /**
+   * Create character animations from the spritesheet
+   */
+  createAnimations() {
+    // Walking animation
+    this.anims.create({
+      key: 'walk',
+      frames: this.anims.generateFrameNumbers('character', {
+        start: 0,
+        end: 9
+      }),
+      frameRate: 10,
+      repeat: -1  // -1 means loop indefinitely
+    });
+
+    // Idle animation
+    this.anims.create({
+      key: 'idle',
+      frames: this.anims.generateFrameNumbers('character', {
+        frames: [0]  // Just use the first frame for standing pose
+      }),
+      frameRate: 10,
+      repeat: -1
+    });
+  }
+
+  /**
+   * Create and configure the player character
+   */
+  createPlayer() {
+    // Add player sprite at the left side of the screen
+    this.player = this.physics.add.sprite(170, 450, 'character');
+
+    // Scale the player if needed
+    this.player.setScale(0.5);
+
+    // Enable physics body
+    this.player.setCollideWorldBounds(true);
+
+    // Adjust the physics body size if the sprite has empty space
+    // This creates a tighter collision box
+    this.player.body.setSize(
+      this.player.width * 0.6,  // 60% of the sprite width
+      this.player.height * 0.8  // 80% of the sprite height
+    );
+
+    // Center the physics body
+    this.player.body.setOffset(
+      this.player.width * 0.2,  // 20% offset from left
+      this.player.height * 0.2  // 20% offset from top
+    );
+  }
+
+  /**
+   * Update game objects on every frame
+   */
+  update() {
+    const speed = 160;  // Movement speed
+    const halfWidth = this.player.width * 0.5 * this.player.scale;
+    const worldWidth = this.scale.width;
+
+    // Reset horizontal velocity
+    this.player.setVelocityX(0);
+
+    // Handle left movement
+    if (this.cursors.left.isDown && this.player.x > halfWidth) {
+      this.player.setVelocityX(-speed);
+      this.player.setFlipX(true);  // Flip sprite to face left
+      this.player.anims.play('walk', true);
+    }
+    // Handle right movement
+    else if (this.cursors.right.isDown && this.player.x < worldWidth - halfWidth) {
+      this.player.setVelocityX(speed);
+      this.player.setFlipX(false);  // Normal orientation facing right
+      this.player.anims.play('walk', true);
+    }
+    // No movement or at edge
+    else {
+      // Play idle animation
+      this.player.anims.play('idle', true);
+    }
+  }
+}</code></pre>
+
+    <h3>9.1: Testing the Complete Game</h3>
+    <p>Save all your files and test your game thoroughly:</p>
+    <ol>
+      <li>Check that the title screen appears with the background and text</li>
+      <li>Press any key to go to the gameplay scene</li>
+      <li>Verify the cat appears and animates properly</li>
+      <li>Test left and right movement</li>
+      <li>Ensure the cat stops at screen edges</li>
+      <li>Press ESC to go to the game over screen</li>
+      <li>Verify you can return to the title screen</li>
+    </ol>
+
+    <h3>9.2: Understand the Code Structure</h3>
+    <p>Take some time to review the complete code and understand how it's organized:</p>
+    <ul>
+      <li><strong>Scene Management:</strong> The game is split into three scenes (Title, Gameplay, GameOver)</li>
+      <li><strong>Method Organization:</strong> We've broken the code into specific methods for different functions</li>
+      <li><strong>Player Setup:</strong> Player creation and configuration is contained in its own method</li>
+      <li><strong>Animation System:</strong> Animations are defined separately from the objects that use them</li>
+      <li><strong>Game Loop:</strong> The <code>update()</code> method handles frame-by-frame logic</li>
+    </ul>
+
+    <p>This modular approach makes the code easier to understand, maintain, and extend.</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 10: Extending Your Game (Optional)</h2>
+    <p>Now that you have a working character animation demo, consider adding some enhancements to make it more
+      interesting:</p>
+
+    <h3>Visual Enhancements:</h3>
+    <ul>
+      <li><strong>Background Parallax:</strong> Create multiple background layers that move at different speeds as the
+        character moves:
+        <pre><code>// In create(), replace the single background with layers:
+this.bg1 = this.add.tileSprite(0, 0, 1200, 600, 'sky').setOrigin(0, 0);
+this.bg2 = this.add.tileSprite(0, 0, 1200, 600, 'mountains').setOrigin(0, 0);
+this.bg3 = this.add.tileSprite(0, 0, 1200, 600, 'ground').setOrigin(0, 0);
+
+// Then in update(), add:
+// Move backgrounds for parallax effect (slower = farther away)
+this.bg1.tilePositionX += 0.1;  // Sky moves very slowly
+this.bg2.tilePositionX += 0.3;  // Mountains move a bit faster
+this.bg3.tilePositionX += 0.5;  // Ground moves the fastest</code></pre>
+      </li>
+
+      <li><strong>Environmental Effects:</strong> Add particle effects when the cat runs:
+        <pre><code>// In create():
+this.particles = this.add.particles('dust');
+this.emitter = this.particles.createEmitter({
+  x: 0,
+  y: 0,
+  speed: { min: 20, max: 40 },
+  scale: { start: 0.4, end: 0 },
+  lifespan: 300,
+  on: false
+});
+
+// In update(), when moving:
+// Update dust particles to follow feet
+if (this.cursors.right.isDown || this.cursors.left.isDown) {
+  this.emitter.setPosition(this.player.x, this.player.y + 20);
+  this.emitter.on = true;
+} else {
+  this.emitter.on = false;
+}</code></pre>
+      </li>
+    </ul>
+
+    <h3>Gameplay Enhancements:</h3>
+    <ul>
+      <li><strong>Vertical Movement:</strong> Add jumping capability:
+        <pre><code>// In update():
+// Enable gravity
+this.physics.world.gravity.y = 300;
+
+// Handle jump
+if (this.cursors.up.isDown && this.player.body.touching.down) {
+  this.player.setVelocityY(-330);
+}</code></pre>
+      </li>
+
+      <li><strong>Collectibles:</strong> Add items for the cat to collect:
+        <pre><code>// In create():
+this.coins = this.physics.add.group({
+  key: 'coin',
+  repeat: 10,
+  setXY: { x: 100, y: 300, stepX: 100 }
+});
+
+// Add collision detection
+this.physics.add.overlap(this.player, this.coins, this.collectCoin, null, this);
+
+// Add collect function
+collectCoin(player, coin) {
+  coin.disableBody(true, true);
+  this.score += 10;
+  this.scoreText.setText(`Score: ${this.score}`);
+}</code></pre>
+      </li>
+    </ul>
+
+    <h3>Audio Enhancements:</h3>
+    <ul>
+      <li><strong>Sound Effects:</strong> Add footstep sounds synchronized with animation:
+        <pre><code>// In create():
+this.walkSound = this.sound.add('footsteps', { loop: true, volume: 0.5 });
+
+// In update():
+if (this.cursors.left.isDown || this.cursors.right.isDown) {
+  if (!this.walkSound.isPlaying) {
+    this.walkSound.play();
+  }
+} else {
+  this.walkSound.stop();
+}</code></pre>
+      </li>
+
+      <li><strong>Background Music:</strong> Add music to each scene:
+        <pre><code>// In TitleScene create():
+this.music = this.sound.add('title-music', { loop: true });
+this.music.play();
+
+// When switching scenes:
+this.music.stop();</code></pre>
+      </li>
+    </ul>
+
+    <p>Choose at least one enhancement to implement to make your character animation demo more engaging. These are just
+      starting points - feel free to be creative and add your own ideas!</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 11: Deployment</h2>
+    <p>Once you're satisfied with your cat animation demo, it's time to deploy it to Netlify for others to play:</p>
+
+    <h3>11.1: Building Your Game for Production</h3>
+    <p>First, build your game for production to create optimized files:</p>
+    <pre><code>npm run build</code></pre>
+    <p>This command will:</p>
+    <ul>
+      <li>Bundle and minify your JavaScript files</li>
+      <li>Optimize your assets</li>
+      <li>Create a <code>dist/</code> directory with the production-ready files</li>
+    </ul>
+
+    <h3>11.2: Testing the Production Build</h3>
+    <p>Before deploying, test your production build locally:</p>
+    <pre><code>npm run preview</code></pre>
+    <p>This will serve your built application locally, typically at <code>http://localhost:4173</code>. Verify that
+      everything works correctly in the production build, including:</p>
+    <ul>
+      <li>Scene transitions</li>
+      <li>Character animation</li>
+      <li>Movement and controls</li>
+      <li>Any additional features you've added</li>
+    </ul>
+
+    <h3>11.3: Committing Your Changes to GitHub</h3>
+    <p>Commit and push your completed project to GitHub.</p>
+
+    <h3>11.4: Deploying to Netlify</h3>
+    <p>Follow these steps to deploy your game to Netlify:</p>
+    <ol>
+      <li>Go to <a href="https://www.netlify.com/">Netlify</a> and sign in (or create an account)</li>
+      <li>Click on "New site from Git"</li>
+      <li>Choose GitHub as your provider and authorize Netlify</li>
+      <li>Select your repository from the list</li>
+      <li>The build settings should be automatically configured by the <code>netlify.toml</code> file that's included in
+        your starter repo:
+        <ul>
+          <li>Build command: <code>npm run build</code></li>
+          <li>Publish directory: <code>dist</code></li>
+        </ul>
+      </li>
+      <li>Click "Deploy site"</li>
+    </ol>
+    <p>Netlify will deploy your site and provide you with a URL where your game is accessible online.</p>
+
+    <h3>11.5: Customizing Your Site</h3>
+    <p>After deploying, you can customize your Netlify site:</p>
+    <ul>
+      <li>Change the auto-generated site name to something meaningful</li>
+    </ul>
+
+    <h3>11.6: Sharing Your Game</h3>
+    <p>Once deployed, you can share your game with others by sending them the Netlify URL. Your cat animation demo is
+      now live on the web!</p>
+  </article>
+
+  <article class="card">
+    <h2>Step 12: Submission</h2>
+    <p>To complete this assignment, submit the following:</p>
+
+    <h3>12.1: Repository and Deployment URLs</h3>
+    <ul>
+      <li><strong>GitHub Repository URL:</strong> The link to your project's GitHub repository</li>
+      <li><strong>Netlify Deployment URL:</strong> The link to your live game on Netlify</li>
+    </ul>
+
+    <h3>12.3: Code Quality</h3>
+    <p>Ensure your code meets these quality standards before submission:</p>
+    <ul>
+      <li><strong>Comments:</strong> All methods and complex code blocks have descriptive comments</li>
+      <li><strong>Organization:</strong> Code is logically organized into methods with clear purposes</li>
+      <li><strong>Naming:</strong> Variables and functions have clear, descriptive names</li>
+      <li><strong>Functionality:</strong> All features work as expected without errors</li>
+    </ul>
+
+  </article>
+</body>
+
+</html>

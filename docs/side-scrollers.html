@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Understanding Side-Scrollers</title>
+  <link rel="shortcut icon" href="./microscope.png" type="image/png">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <nav class="site-nav">
+        <div class="logo">
+          <a href="index.html">
+            <img src="./microscope.png" alt="phaser logo" class="logo-img">
+            <span>Sprite Animation</span>
+          </a>
+        </div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assignment.html" class="nav-link">Assignment</a></li>
+          <li><a href="sprite-sheets.html" class="nav-link">Sprite Sheets</a></li>
+          <li><a href="side-scrollers.html" class="nav-link">Side-Scrollers</a></li>
+          <li><a href="phaser-animation.html" class="nav-link">Animation</a></li>
+          <li><a href="common-pitfalls.html" class="nav-link">Pitfalls</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="header">
+
+    <h1>Understanding Side-Scrollers</h1>
+    <p>A guide to side-scrolling game mechanics and implementation</p>
+  </section>
+
+  <article class="card">
+    <h2>What Are Side-Scrollers?</h2>
+    <p>
+      Side-scrolling games are a genre of video games where the gameplay action is viewed from a side-view camera angle,
+      and the game world scrolls horizontally as the player character moves left or right. This perspective creates a 2D
+      play environment where characters typically move on a horizontal plane.
+    </p>
+    <p>
+      Some of the most iconic video games in history are side-scrollers, including:
+    </p>
+    <ul>
+      <li>Super Mario Bros.</li>
+      <li>Sonic the Hedgehog</li>
+      <li>Metroid</li>
+      <li>Castlevania</li>
+      <li>Mega Man</li>
+    </ul>
+    <p>
+      Side-scrollers can be further categorized into sub-genres like platformers (focused on jumping between platforms),
+      run 'n' gun games (focused on combat), and exploration-based games (like Metroidvanias).
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Key Elements of Side-Scrollers</h2>
+    <p>
+      Side-scrolling games typically include these core elements:
+    </p>
+    <ul>
+      <li>
+        <strong>Character Movement:</strong> Players control a character that moves horizontally (and often vertically
+        through jumping)
+      </li>
+      <li>
+        <strong>Camera System:</strong> The view scrolls to follow the player's movement
+      </li>
+      <li>
+        <strong>Layered Backgrounds:</strong> Multiple background layers that may move at different speeds (parallax
+        scrolling)
+      </li>
+      <li>
+        <strong>Platforms and Terrain:</strong> Level design featuring platforms, obstacles, and terrain
+      </li>
+      <li>
+        <strong>Collectibles:</strong> Items that players can gather (coins, power-ups, etc.)
+      </li>
+      <li>
+        <strong>Enemies:</strong> Obstacles that move or attack the player
+      </li>
+    </ul>
+    <p>
+      In this assignment, we're focusing on the character animation and movement aspects, which form the foundation of
+      any side-scrolling game.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Types of Side-Scrollers</h2>
+    <p>
+      There are several variations of side-scrolling games:
+    </p>
+    <ul>
+      <li>
+        <strong>Fixed Screen:</strong> The earliest type where the screen changes only when the player reaches the edge
+      </li>
+      <li>
+        <strong>Continuous Scrolling:</strong> The screen moves constantly, forcing the player to keep up (like endless
+        runners)
+      </li>
+      <li>
+        <strong>Character-Centered:</strong> The screen follows the player character (most common type)
+      </li>
+      <li>
+        <strong>Multi-Directional:</strong> Allows scrolling in multiple directions (horizontal and vertical)
+      </li>
+    </ul>
+    <p>
+      Our project implements a character-centered approach where the character stays relatively fixed on screen while
+      the background would scroll (in a more complete implementation).
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Character Movement in Side-Scrollers</h2>
+    <p>
+      Character movement is the heart of any side-scroller. The typical movement patterns include:
+    </p>
+    <ul>
+      <li>
+        <strong>Horizontal Movement:</strong> Left and right movement, often with acceleration/deceleration
+      </li>
+      <li>
+        <strong>Jumping:</strong> Vertical movement with gravity and potentially variable jump heights
+      </li>
+      <li>
+        <strong>State Changes:</strong> Different animations for different states (idle, running, jumping, etc.)
+      </li>
+      <li>
+        <strong>Direction Facing:</strong> Characters flip to face the direction of movement
+      </li>
+    </ul>
+    <p>
+      In our project, we're implementing basic horizontal movement and direction facing, with appropriate animation
+      states.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Implementing Side-Scrolling in Phaser</h2>
+    <p>
+      There are two main approaches to implementing side-scrolling in Phaser:
+    </p>
+    <h3>1. Moving the Character (Basic)</h3>
+    <p>
+      In this approach, the character moves across the screen, but the camera and world stay fixed. This works well for
+      games with limited world size or where the action takes place on a single screen.
+    </p>
+    <pre><code>// Character movement without camera scrolling
+update() {
+  // Reset velocity
+  this.player.setVelocityX(0);
+
+  if (this.cursors.left.isDown) {
+    this.player.setVelocityX(-160);
+    this.player.setFlipX(true);
+    this.player.anims.play('walk', true);
+  }
+  else if (this.cursors.right.isDown) {
+    this.player.setVelocityX(160);
+    this.player.setFlipX(false);
+    this.player.anims.play('walk', true);
+  }
+  else {
+    this.player.anims.play('idle', true);
+  }
+}</code></pre>
+    <p>
+      This is the approach we're using in our assignment for simplicity.
+    </p>
+
+    <h3>2. Moving the Camera (Advanced)</h3>
+    <p>
+      For larger worlds, you'll want the camera to follow the player. Phaser makes this easy:
+    </p>
+    <pre><code>// Create a larger world
+this.physics.world.bounds.width = 3200;
+this.physics.world.bounds.height = 600;
+
+// Make the camera follow the player
+this.cameras.main.setBounds(0, 0, 3200, 600);
+this.cameras.main.startFollow(this.player);</code></pre>
+    <p>
+      With this approach, you can create expansive worlds that scroll as the player moves.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Adding Parallax Scrolling</h2>
+    <p>
+      Parallax scrolling is a technique where background layers move at different speeds, creating an illusion of depth.
+      While not part of our basic assignment, it's a common feature in side-scrollers:
+    </p>
+    <pre><code>// Create background layers (in create())
+this.bg1 = this.add.tileSprite(0, 0, 800, 600, 'sky').setOrigin(0, 0);
+this.bg2 = this.add.tileSprite(0, 0, 800, 600, 'mountains').setOrigin(0, 0);
+this.bg3 = this.add.tileSprite(0, 0, 800, 600, 'ground').setOrigin(0, 0);
+
+// Update the layers each frame (in update())
+update() {
+  // Update background layers (parallax effect)
+  this.bg1.tilePositionX += 0.1;  // Sky moves very slowly
+  this.bg2.tilePositionX += 0.3;  // Mountains move a bit faster
+  this.bg3.tilePositionX += 0.5;  // Ground moves the fastest
+
+  // Rest of player movement code...
+}</code></pre>
+    <p>
+      This creates a beautiful parallax effect where distant objects (like the sky) move more slowly than close objects
+      (like the ground).
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Designing Side-Scroller Levels</h2>
+    <p>
+      Good level design is crucial for side-scrollers. Consider these principles:
+    </p>
+    <ul>
+      <li>
+        <strong>Progression:</strong> Gradually introduce mechanics and increase difficulty
+      </li>
+      <li>
+        <strong>Rhythm:</strong> Create a good rhythm of challenges and breaks
+      </li>
+      <li>
+        <strong>Visual Guides:</strong> Use visual cues to guide players
+      </li>
+      <li>
+        <strong>Verticality:</strong> Utilize both horizontal and vertical space
+      </li>
+      <li>
+        <strong>Checkpoints:</strong> Place regular save points or checkpoints
+      </li>
+    </ul>
+    <p>
+      While our current project doesn't include complex level design, these principles are important for any
+      side-scrolling game you might create in the future.
+    </p>
+  </article>
+
+  <article class="card">
+    <h2>Common Side-Scroller Features</h2>
+    <p>
+      To expand your side-scroller beyond this basic assignment, consider adding these common features:
+    </p>
+    <ul>
+      <li>
+        <strong>Jumping and Platforms:</strong> Add vertical movement and platforms to traverse
+      </li>
+      <li>
+        <strong>Collectibles:</strong> Items to gather for points or power-ups
+      </li>
+      <li>
+        <strong>Enemies:</strong> Obstacles that require skill to overcome
+      </li>
+      <li>
+        <strong>Special Abilities:</strong> Double jumps, dashes, or other special moves
+      </li>
+      <li>
+        <strong>Environmental Hazards:</strong> Spikes, pits, or other dangers
+      </li>
+      <li>
+        <strong>Scrolling Backgrounds:</strong> Parallax effects for depth
+      </li>
+    </ul>
+    <p>
+      As you master the basics of character animation and movement, these additional features can make your game more
+      engaging and complete.
+    </p>
+  </article>
+</body>
+
+</html>

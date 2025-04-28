@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Common Pitfalls and Solutions</title>
+  <link rel="shortcut icon" href="./microscope.png" type="image/png">
+  <link rel="stylesheet" href="header.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="container">
+      <nav class="site-nav">
+        <div class="logo">
+          <a href="index.html">
+            <img src="./microscope.png" alt="phaser logo" class="logo-img">
+            <span>Sprite Animation</span>
+          </a>
+        </div>
+        <ul class="nav-links">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="assignment.html" class="nav-link">Assignment</a></li>
+          <li><a href="sprite-sheets.html" class="nav-link">Sprite Sheets</a></li>
+          <li><a href="side-scrollers.html" class="nav-link">Side-Scrollers</a></li>
+          <li><a href="phaser-animation.html" class="nav-link">Animation</a></li>
+          <li><a href="common-pitfalls.html" class="nav-link">Pitfalls</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="header">
+
+    <h1>Common Pitfalls and Solutions</h1>
+    <p>Troubleshooting guide for Sprite Animation projects</p>
+  </section>
+
+  <article class="card">
+    <h2>Sprite Sheet Loading Issues</h2>
+    <p>
+      One of the most common issues is incorrectly loading sprite sheets. Here are typical problems and solutions:
+    </p>
+
+    <h3>Problem: Sprite not visible or shows as a blank rectangle</h3>
+    <ul>
+      <li><strong>Cause:</strong> Incorrect file path or asset not found</li>
+      <li><strong>Solution:</strong> Double-check the file path. Assets should be in the
+        <code>public/assets/images/</code> directory.
+      </li>
+    </ul>
+    <pre><code>// Correct
+this.load.spritesheet('character', 'assets/images/character.png', {...});
+
+// Incorrect - missing assets/ prefix
+this.load.spritesheet('character', 'images/character.png', {...});</code></pre>
+
+    <h3>Problem: Sprite appears distorted or shows only part of the frame</h3>
+    <ul>
+      <li><strong>Cause:</strong> Incorrect frame dimensions</li>
+      <li><strong>Solution:</strong> Measure the exact pixel dimensions of a single frame in your sprite sheet</li>
+    </ul>
+    <pre><code>// Make sure these dimensions match your sprite sheet
+this.load.spritesheet('character', 'assets/images/character.png', {
+  frameWidth: 64,   // Exact width of one frame
+  frameHeight: 96   // Exact height of one frame
+});</code></pre>
+
+    <h3>Problem: Only seeing the first frame regardless of animation</h3>
+    <ul>
+      <li><strong>Cause:</strong> Animation not properly created or not being played</li>
+      <li><strong>Solution:</strong> Check animation creation and play code</li>
+    </ul>
+    <pre><code>// First, check animation creation:
+this.anims.create({
+  key: 'walk',
+  frames: this.anims.generateFrameNumbers('character', { start: 0, end: 9 }),
+  frameRate: 10,
+  repeat: -1
+});
+
+// Then check if it's being played correctly:
+this.player.anims.play('walk', true);</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Animation Problems</h2>
+    <p>
+      Issues with animations not playing correctly:
+    </p>
+
+    <h3>Problem: Animation plays too fast or too slow</h3>
+    <ul>
+      <li><strong>Cause:</strong> Inappropriate frameRate value</li>
+      <li><strong>Solution:</strong> Adjust the frameRate value when creating the animation</li>
+    </ul>
+    <pre><code>// Slower animation (5 frames per second)
+this.anims.create({
+  key: 'walk',
+  frames: this.anims.generateFrameNumbers('character', { start: 0, end: 9 }),
+  frameRate: 5,  // Lower number = slower animation
+  repeat: -1
+});
+
+// Faster animation (20 frames per second)
+this.anims.create({
+  key: 'walk',
+  frames: this.anims.generateFrameNumbers('character', { start: 0, end: 9 }),
+  frameRate: 20,  // Higher number = faster animation
+  repeat: -1
+});</code></pre>
+
+    <h3>Problem: Animation doesn't loop or stops unexpectedly</h3>
+    <ul>
+      <li><strong>Cause:</strong> Incorrect repeat setting or animation being stopped by code</li>
+      <li><strong>Solution:</strong> Check repeat settings and any animation-stopping code</li>
+    </ul>
+    <pre><code>// Infinite loop animation
+this.anims.create({
+  key: 'walk',
+  frames: this.anims.generateFrameNumbers('character', { start: 0, end: 9 }),
+  frameRate: 10,
+  repeat: -1  // -1 means loop forever
+});
+
+// Play once only
+this.anims.create({
+  key: 'jump',
+  frames: this.anims.generateFrameNumbers('character', { start: 10, end: 15 }),
+  frameRate: 10,
+  repeat: 0  // 0 means play once and stop
+});</code></pre>
+
+    <h3>Problem: Wrong frames playing in the animation</h3>
+    <ul>
+      <li><strong>Cause:</strong> Incorrect start/end frame indices</li>
+      <li><strong>Solution:</strong> Double-check frame indices in your sprite sheet</li>
+    </ul>
+    <pre><code>// Frames are counted from 0, not 1!
+this.anims.create({
+  key: 'walk',
+  frames: this.anims.generateFrameNumbers('character', {
+    // If your sprite sheet has 10 walking frames:
+    start: 0,  // First frame
+    end: 9     // Last frame (not 10!)
+  }),
+  frameRate: 10,
+  repeat: -1
+});</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Movement and Input Issues</h2>
+    <p>
+      Problems with character movement and input handling:
+    </p>
+
+    <h3>Problem: Character doesn't move when arrow keys are pressed</h3>
+    <ul>
+      <li><strong>Cause:</strong> Input not set up correctly or physics issues</li>
+      <li><strong>Solution:</strong> Check cursor setup and velocity setting</li>
+    </ul>
+    <pre><code>// Make sure cursors are created in create()
+this.cursors = this.input.keyboard.createCursorKeys();
+
+// In update(), check input and set velocity
+if (this.cursors.left.isDown) {
+  this.player.setVelocityX(-160);  // Must be a non-zero value
+}
+else if (this.cursors.right.isDown) {
+  this.player.setVelocityX(160);   // Must be a non-zero value
+}
+else {
+  this.player.setVelocityX(0);     // Reset velocity when no keys pressed
+}</code></pre>
+
+    <h3>Problem: Character moves but animation doesn't change</h3>
+    <ul>
+      <li><strong>Cause:</strong> Missing animation play code in movement handling</li>
+      <li><strong>Solution:</strong> Add animation play commands with movement code</li>
+    </ul>
+    <pre><code>// Complete movement code with animations:
+if (this.cursors.left.isDown) {
+  this.player.setVelocityX(-160);
+  this.player.setFlipX(true);          // Flip sprite to face left
+  this.player.anims.play('walk', true); // Play walking animation
+}
+else if (this.cursors.right.isDown) {
+  this.player.setVelocityX(160);
+  this.player.setFlipX(false);          // Normal orientation
+  this.player.anims.play('walk', true);  // Play walking animation
+}
+else {
+  this.player.setVelocityX(0);
+  this.player.anims.play('idle', true);  // Play idle animation when not moving
+}</code></pre>
+
+    <h3>Problem: Character doesn't stop at screen edges</h3>
+    <ul>
+      <li><strong>Cause:</strong> World bounds not set or not checking boundaries in movement code</li>
+      <li><strong>Solution:</strong> Enable collision with world bounds or add boundary checks</li>
+    </ul>
+    <pre><code>// Solution 1: Enable world bounds collision
+this.player.setCollideWorldBounds(true);
+
+// Solution 2: Manual boundary checking
+if (this.cursors.left.isDown && this.player.x > 0) {
+  this.player.setVelocityX(-160);
+  // rest of left movement code...
+}
+else if (this.cursors.right.isDown && this.player.x < this.sys.game.config.width) {
+  this.player.setVelocityX(160);
+  // rest of right movement code...
+}</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Debugging Tips</h2>
+    <p>
+      When things go wrong, use these debugging techniques:
+    </p>
+
+    <h3>Use Console Logging</h3>
+    <p>
+      Add <code>console.log()</code> statements to check values and execution flow:
+    </p>
+    <pre><code>// Log sprite position
+console.log('Player position:', this.player.x, this.player.y);
+
+// Log animation state
+console.log('Current animation:', this.player.anims.currentAnim?.key);
+
+// Log input state
+console.log('Left key down:', this.cursors.left.isDown);</code></pre>
+
+    <h3>Enable Physics Debug Visualization</h3>
+    <p>
+      See collision boxes and physics bodies:
+    </p>
+    <pre><code>// In the game config
+const config = {
+  // other config...
+  physics: {
+    default: 'arcade',
+    arcade: {
+      gravity: { y: 0 },
+      debug: true  // Set to true to see physics bodies
+    }
+  }
+};</code></pre>
+
+    <h3>Check Asset Loading</h3>
+    <p>
+      Make sure assets are loading properly:
+    </p>
+    <pre><code>// Add loading listeners
+this.load.on('complete', function() {
+  console.log('All assets loaded successfully');
+});
+
+this.load.on('loaderror', function(file) {
+  console.error('Error loading asset:', file.src);
+});</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Common Code Examples</h2>
+    <p>
+      Here are some common tasks and their solutions:
+    </p>
+
+    <h3>Making Animation Speed Depend on Movement Speed</h3>
+    <pre><code>// Faster animation when moving faster
+const speed = 160;
+const animSpeed = 10;
+
+if (this.cursors.right.isDown && this.cursors.shift.isDown) {
+  // Running
+  const runSpeed = speed * 2;
+  const runAnimSpeed = animSpeed * 1.5;
+
+  this.player.setVelocityX(runSpeed);
+  this.player.anims.play('walk', true);
+  this.player.anims.msPerFrame = 1000 / runAnimSpeed;
+}
+else if (this.cursors.right.isDown) {
+  // Walking
+  this.player.setVelocityX(speed);
+  this.player.anims.play('walk', true);
+  this.player.anims.msPerFrame = 1000 / animSpeed;
+}</code></pre>
+
+    <h3>Adding a Jump with Animation</h3>
+    <pre><code>// In create():
+// Set up jump animation
+this.anims.create({
+  key: 'jump',
+  frames: this.anims.generateFrameNumbers('character', { start: 15, end: 18 }),
+  frameRate: 10,
+  repeat: 0  // Don't repeat jump animation
+});
+
+// Enable gravity
+this.physics.world.gravity.y = 300;
+
+// In update():
+// Jump when up arrow pressed
+if (this.cursors.up.isDown && this.player.body.touching.down) {
+  this.player.setVelocityY(-330);
+  this.player.anims.play('jump', true);
+}
+
+// Return to idle/walk when landing
+if (!this.player.body.touching.down) {
+  // In the air
+  this.player.anims.play('jump', true);
+} else if (this.cursors.left.isDown || this.cursors.right.isDown) {
+  // On ground and moving
+  this.player.anims.play('walk', true);
+} else {
+  // On ground and not moving
+  this.player.anims.play('idle', true);
+}</code></pre>
+  </article>
+
+  <article class="card">
+    <h2>Performance Issues</h2>
+    <p>
+      If your game is running slowly:
+    </p>
+    <ul>
+      <li>
+        <strong>Minimize Debug Outputs:</strong> Remove unnecessary console.log statements in production
+      </li>
+      <li>
+        <strong>Use Sprite Sheets:</strong> Combine images into sprite sheets rather than loading many separate images
+      </li>
+      <li>
+        <strong>Optimize Physics:</strong> Disable physics for objects that don't need it
+      </li>
+      <li>
+        <strong>Use Object Pooling:</strong> Reuse game objects instead of creating/destroying them frequently
+      </li>
+      <li>
+        <strong>Manage Active Animations:</strong> Stop animations that aren't visible
+      </li>
+    </ul>
+  </article>
+</body>
+
+</html>
